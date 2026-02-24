@@ -1,1 +1,169 @@
-/* Add styles here */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2ecc71;
+    --background-color: #f4f7f6;
+    --card-background: #ffffff;
+    --text-color: #333333;
+    --light-text-color: #777777;
+    --border-color: #dddddd;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    
+    --level-1-color: #58D68D; /* 원활 */
+    --level-2-color: #F4D03F; /* 보통 */
+    --level-3-color: #E67E22; /* 혼잡 */
+    --level-4-color: #C0392B; /* 매우 혼잡 */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 600px;
+    background-color: var(--card-background);
+    border-radius: 12px;
+    box-shadow: 0 8px 25px var(--shadow-color);
+    overflow: hidden;
+}
+
+header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 24px;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+}
+
+main {
+    padding: 24px;
+}
+
+#congestion-form .form-group {
+    margin-bottom: 20px;
+}
+
+#congestion-form label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+#congestion-form select,
+#congestion-form input[type="date"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: inherit;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: #fff;
+}
+
+#congestion-form select {
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 12px;
+}
+
+
+#congestion-form button[type="submit"] {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#congestion-form button[type="submit"]:hover {
+    background-color: #2980b9;
+}
+
+#results-container {
+    margin-top: 28px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border-color);
+}
+
+#results-title {
+    font-size: 1.4rem;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+#results-list {
+    list-style: none;
+}
+
+#results-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    background-color: var(--background-color);
+}
+
+#results-list .level {
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 20px;
+    color: white;
+    font-size: 0.9rem;
+}
+
+.level-1 { background-color: var(--level-1-color); }
+.level-2 { background-color: var(--level-2-color); color: var(--text-color);}
+.level-3 { background-color: var(--level-3-color); }
+.level-4 { background-color: var(--level-4-color); }
+
+.hidden {
+    display: none;
+}
+
+footer {
+    padding: 20px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--light-text-color);
+    background-color: #f0f0f0;
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 0;
+    }
+    .app-container {
+        border-radius: 0;
+    }
+}

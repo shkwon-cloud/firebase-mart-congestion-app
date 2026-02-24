@@ -1,14 +1,55 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
-  <link href='/style.css' rel='stylesheet'>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대형마트 혼잡도 예측 서비스</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <button onclick="console.log('hello');">Press me</button>
-  <script defer type="text/javascript" src="/main.js"></script>
+    <div class="app-container">
+        <header>
+            <h1>대형마트 혼잡도 조회</h1>
+            <p>방문할 대형마트의 예상 혼잡도를 확인하고 쾌적하게 쇼핑하세요.</p>
+        </header>
+        <main>
+            <form id="congestion-form">
+                <div class="form-group">
+                    <label for="region">방문 지역</label>
+                    <select id="region" name="region">
+                        <option value="seoul_gangnam">서울 강남</option>
+                        <option value="anyang_pyeongchon">안양 평촌</option>
+                        <option value="gunpo_sanbon">군포 산본</option>
+                        <option value="uiwang">경기 의왕</option>
+                        <option value="seoul_yangjae">서울 양재</option>
+                        <option value="gyeonggi_gwangmyeong">경기 광명</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="mart">대형마트 선택</label>
+                    <select id="mart" name="mart">
+                        <option value="emart">이마트</option>
+                        <option value="homeplus">홈플러스</option>
+                        <option value="traders">트레이더스 클럽</option>
+                        <option value="costco">코스트코</option>
+                        <option value="lottemart">롯데마트</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="date">방문 날짜</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+                <button type="submit">혼잡도 확인하기</button>
+            </form>
+            <section id="results-container" class="hidden">
+                <h2 id="results-title"></h2>
+                <ul id="results-list"></ul>
+            </section>
+        </main>
+        <footer>
+            <p>본 서비스가 제공하는 정보는 통계 기반의 추정치이며 실제와 다를 수 있습니다.</p>
+        </footer>
+    </div>
+    <script src="main.js"></script>
 </body>
 </html>
