@@ -116,8 +116,15 @@ main {
 
 #results-title {
     font-size: 1.4rem;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
     text-align: center;
+}
+
+#weather-info {
+    text-align: center;
+    color: var(--light-text-color);
+    margin-bottom: 16px;
+    font-size: 1.1rem;
 }
 
 #results-list {

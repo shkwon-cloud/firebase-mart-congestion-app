@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const dateInput = document.getElementById('date');
     const resultsContainer = document.getElementById('results-container');
     const resultsTitle = document.getElementById('results-title');
+    const weatherInfoElement = document.getElementById('weather-info'); // New element
     const resultsList = document.getElementById('results-list');
 
     // Set default date to today
@@ -16,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         
         const regionValue = form.region.value;
+        const regionText = form.region.options[form.region.selectedIndex].text; // Get text for display
         const mart = form.mart.options[form.mart.selectedIndex];
         const martValue = mart.value;
         const martText = mart.text;
@@ -24,16 +26,40 @@ document.addEventListener('DOMContentLoaded', () => {
         resultsContainer.classList.remove('hidden');
         resultsList.innerHTML = '<li>데이터를 불러오는 중입니다...</li>';
         resultsTitle.textContent = '';
+        weatherInfoElement.textContent = '날씨 정보 불러오는 중...'; // Clear and show loading for weather
 
         try {
-            // Step 1: Attempt to fetch from the primary API
-            const apiData = await fetchCongestionFromAPI(regionValue, martValue, date);
-            renderResults(apiData, region, martText, date); // Keep original 'region' for rendering
+            // Call both APIs in parallel using Promise.allSettled
+            const [congestionResult, weatherResult] = await Promise.allSettled([
+                fetchCongestionFromAPI(regionValue, martValue, date),
+                fetchTemperatureFromAPI(regionValue, date) // New API call
+            ]);
+
+            let congestionData;
+            if (congestionResult.status === 'fulfilled') {
+                congestionData = congestionResult.value;
+            } else {
+                console.warn('API fetch failed, using fallback model:', congestionResult.reason);
+                congestionData = getFallbackCongestionData(martValue, date);
+            }
+
+            let weatherData = null;
+            if (weatherResult.status === 'fulfilled') {
+                weatherData = weatherResult.value;
+            } else {
+                console.warn('Weather API fetch failed:', weatherResult.reason);
+            }
+            
+            // Pass weatherData to renderResults
+            renderResults(congestionData, weatherData, regionText, martText, date);
+
         } catch (error) {
-            // Step 2: If API fails, use the fallback model
-            console.warn('API fetch failed, using fallback model:', error);
-            const fallbackData = getFallbackCongestionData(martValue, date);
-            renderResults(fallbackData, region, martText, date); // Keep original 'region' for rendering
+            // This catch block would only be hit if Promise.allSettled itself rejects,
+            // which should not happen. Individual promise rejections are handled within
+            // the allSettled results.
+            console.error("An unexpected error occurred:", error);
+            resultsList.innerHTML = '<li>오류가 발생했습니다.</li>';
+            weatherInfoElement.textContent = '';
         }
     });
 
@@ -70,6 +96,31 @@ document.addEventListener('DOMContentLoaded', () => {
         // For all other combinations, the API call fails to demonstrate the fallback
         return Promise.reject('API endpoint not available for the selected combination.');
     }
+
+    /**
+     * Fetches temperature data from a (simulated) API.
+     */
+    function fetchTemperatureFromAPI(regionValue, date) {
+        // This is a mock API call for temperature.
+        // In a real scenario, you would use fetch() to an actual weather API.
+        console.log(`Fetching temperature for ${regionValue} on ${date.toISOString().split('T')[0]}`);
+        
+        // Simulate varying temperatures based on region or just a random value for now
+        const minTemp = Math.floor(Math.random() * 10) + 5; // 5 to 14
+        const maxTemp = minTemp + Math.floor(Math.random() * 10) + 5; // minTemp + 5 to 14
+        const avgTemp = Math.round((minTemp + maxTemp) / 2);
+
+        return new Promise(resolve => {
+            setTimeout(() => { // Simulate network delay
+                resolve({
+                    min_temp: minTemp,
+                    max_temp: maxTemp,
+                    avg_temp: avgTemp
+                });
+            }, 500);
+        });
+    }
+
 
     /**
      * Generates congestion data based on a heuristic model.
@@ -132,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
     /**
      * Renders the results in the DOM.
      */
-    function renderResults(data, region, martText, date) {
+    function renderResults(congestionData, weatherData, regionText, martText, date) { // Updated signature
         const dateString = date.toLocaleDateString('ko-KR', {
             year: 'numeric',
             month: 'long',
@@ -140,15 +191,24 @@ document.addEventListener('DOMContentLoaded', () => {
             weekday: 'long'
         });
 
-        resultsTitle.textContent = `${dateString} ${martText} 예상 혼잡도 (출처: ${data.source})`;
+        // Update results title
+        resultsTitle.textContent = `${dateString} ${martText} 예상 혼잡도 (출처: ${congestionData.source})`;
+
+        // Update weather info
+        if (weatherData) {
+            weatherInfoElement.textContent = `예상 기온: 최저 ${weatherData.min_temp}°C / 최고 ${weatherData.max_temp}°C`;
+        } else {
+            weatherInfoElement.textContent = '날씨 정보를 불러올 수 없습니다.';
+        }
+
 
         resultsList.innerHTML = '';
-        if (data.hourly_congestion.length === 0) {
+        if (congestionData.hourly_congestion.length === 0) {
             resultsList.innerHTML = '<li>데이터가 없습니다.</li>';
             return;
         }
 
-        data.hourly_congestion.forEach(item => {
+        congestionData.hourly_congestion.forEach(item => {
             const li = document.createElement('li');
             li.innerHTML = `
                 <span class="time">${item.hour}:00 - ${item.hour + 1}:00</span>
@@ -158,3 +218,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
