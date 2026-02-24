@@ -98,27 +98,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     /**
-     * Fetches temperature data from a (simulated) API.
+     * Fetches temperature data from the Open-Meteo API.
      */
-    function fetchTemperatureFromAPI(regionValue, date) {
-        // This is a mock API call for temperature.
-        // In a real scenario, you would use fetch() to an actual weather API.
-        console.log(`Fetching temperature for ${regionValue} on ${date.toISOString().split('T')[0]}`);
-        
-        // Simulate varying temperatures based on region or just a random value for now
-        const minTemp = Math.floor(Math.random() * 10) + 5; // 5 to 14
-        const maxTemp = minTemp + Math.floor(Math.random() * 10) + 5; // minTemp + 5 to 14
-        const avgTemp = Math.round((minTemp + maxTemp) / 2);
+    async function fetchTemperatureFromAPI(regionValue, date) {
+        const REGION_COORDINATES = {
+            seoul_gangnam: { latitude: 37.5172, longitude: 127.0473 },
+            anyang_pyeongchon: { latitude: 37.3923, longitude: 126.9567 },
+            gunpo_sanbon: { latitude: 37.3591, longitude: 126.9328 },
+            uiwang: { latitude: 37.3452, longitude: 126.9685 },
+            seoul_yangjae: { latitude: 37.4836, longitude: 127.0326 },
+            gyeonggi_gwangmyeong: { latitude: 37.4786, longitude: 126.8654 },
+        };
 
-        return new Promise(resolve => {
-            setTimeout(() => { // Simulate network delay
-                resolve({
-                    min_temp: minTemp,
-                    max_temp: maxTemp,
-                    avg_temp: avgTemp
-                });
-            }, 500);
-        });
+        const coords = REGION_COORDINATES[regionValue];
+        if (!coords) {
+            throw new Error(`Coordinates not found for region: ${regionValue}`);
+        }
+
+        const dateString = date.toISOString().split('T')[0];
+        const apiUrl = `https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&daily=temperature_2m_max,temperature_2m_min&start_date=${dateString}&end_date=${dateString}&timezone=Asia/Seoul`;
+
+        console.log(`Fetching real temperature from: ${apiUrl}`);
+
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error(`Weather API request failed with status ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (data.daily && data.daily.temperature_2m_min && data.daily.temperature_2m_max) {
+            return {
+                min_temp: data.daily.temperature_2m_min[0],
+                max_temp: data.daily.temperature_2m_max[0]
+            };
+        } else {
+            throw new Error('Invalid data format from Weather API');
+        }
     }
 
 
